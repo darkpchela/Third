@@ -7,10 +7,10 @@ namespace Third
 {
     internal class Program
     {
-        private const string InvalidMoveMesssage = "Incorrect move key. Move key must be" +
+        private const string InvalidMoveMesssage = "Invalid move key. Move key must be" +
             " integer number from the available moves. Try again.";
 
-        private const string ExecExceptionMessage = "Incorrect input parameters. \n" +
+        private const string ExecExceptionMessage = "Invalid input parameters. \n" +
             "Parameters must be uniq strings.Their count must be odd and equals at least 3. \n" +
             "Exampple: dotnet thrid.exe rock paper scissors lizard Spock";
 
