@@ -12,7 +12,7 @@ namespace Third
 
         private const string ExecExceptionMessage = "Invalid input parameters. \n" +
             "Parameters must be uniq strings.Their count must be odd and equals at least 3. \n" +
-            "Exampple: dotnet thrid.exe rock paper scissors lizard Spock";
+            "Exampple: thrid.exe rock paper scissors lizard Spock";
 
         private static readonly Dictionary<int, string> _movesDictionary = new Dictionary<int, string>();
 
