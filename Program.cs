@@ -12,7 +12,7 @@ namespace Third
 
         private const string ExecExceptionMessage = "Invalid input parameters. \n" +
             "Parameters must be uniq strings.Their count must be odd and equals at least 3. \n" +
-            "Exampple: >Third.exe rock paper scissors lizard Spock";
+            "Example: >Third.exe rock paper scissors lizard Spock";
 
         private static readonly Dictionary<int, string> _movesDictionary = new Dictionary<int, string>();
 
@@ -98,6 +98,7 @@ namespace Third
         {
             while (true)
             {
+                Console.WriteLine("Enter your move: ");
                 if (int.TryParse(Console.ReadLine(), out int moveKey) && _movesDictionary.ContainsKey(moveKey))
                     return moveKey;
                 else
