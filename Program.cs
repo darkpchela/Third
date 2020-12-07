@@ -10,7 +10,7 @@ namespace Third
         private const string InvalidMoveMesssage = "Incorrect move key. Move key must be" +
             " integer number from the available moves. Try again.";
 
-        private const string ExecExceptionMessage = "Incorrect input parameters. \n " +
+        private const string ExecExceptionMessage = "Incorrect input parameters. \n" +
             "Parameters must be uniq strings.Their count must be odd and equals at least 3. \n" +
             "Exampple: dotnet thrid.exe rock paper scissors lizard Spock";
 
@@ -28,7 +28,7 @@ namespace Third
 
             var aiMove = GetAIMove();
 
-            Console.WriteLine($"HMAC: \n {aiMove.HMACStringView}");
+            Console.WriteLine($"HMAC: {aiMove.HMACStringView}");
             Console.WriteLine("Available moves:");
 
             foreach (var mov in _movesDictionary)
@@ -147,9 +147,7 @@ namespace Third
                 HMACKey = new byte[16];
 
                 using (var cRnd = new RNGCryptoServiceProvider())
-                {
                     cRnd.GetBytes(HMACKey);
-                }
 
                 var hmac = new HMACSHA256(HMACKey);
                 string aiMove = movesDictionary[moveKey];
