@@ -1,31 +1,36 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
-using System;
+using System.Text;
 
 namespace Third
 {
-    class Program
+    internal class Program
     {
-        const string IncorrectMoveMesssage = "Incorrect move key. Move key must be integer number from the available moves." +
-            " Try again.";
-        const string ExecExceptionMessage = "Incorrect input parameters. \n " +
+        private const string InvalidMoveMesssage = "Incorrect move key. Move key must be" +
+            " integer number from the available moves. Try again.";
+
+        private const string ExecExceptionMessage = "Incorrect input parameters. \n " +
             "Parameters must be uniq strings.Their count must be odd and equals at least 3. \n" +
             "Exampple: dotnet thrid.exe rock paper scissors lizard Spock";
-        private static Dictionary<int, string> _movesDictionary = new Dictionary<int, string>();
-        static void Main(string[] args)
+
+        private static readonly Dictionary<int, string> _movesDictionary = new Dictionary<int, string>();
+
+        private static void Main(string[] args)
         {
             if (!InputsAreValid(args))
             {
                 Console.WriteLine(ExecExceptionMessage);
                 return;
             }
+
             InitializeMovesDictionary(args);
 
             var aiMove = GetAIMove();
-            Console.WriteLine($"HMAC: \n {aiMove.HMACStringView}");
 
+            Console.WriteLine($"HMAC: \n {aiMove.HMACStringView}");
             Console.WriteLine("Available moves:");
+
             foreach (var mov in _movesDictionary)
                 Console.WriteLine($"{mov.Key} : {mov.Value}");
 
@@ -42,45 +47,20 @@ namespace Third
                 case 0:
                     Console.WriteLine("Draw!");
                     break;
+
                 case 1:
                     Console.WriteLine("You win!");
                     break;
+
                 case 2:
                     Console.WriteLine("You lose!");
                     break;
             }
+
             Console.WriteLine($"HMAC key: {aiMove.HMACKeyStringView}");
-            Test2(aiMove);
-
-
         }
 
-        static void Test()
-        {
-            for (var i = 1; i < _movesDictionary.Count; i++)
-            {
-                for (var j = 1; j < _movesDictionary.Count; j++)
-                {
-                    Console.WriteLine($"Ai {_movesDictionary[i]} Plr {_movesDictionary[j]} Res {CalcResult(i, j)}");
-                }
-            }
-        }
-
-        static void Test2(EncryptedMove move)
-        {
-            Console.WriteLine();
-            using (var hmac = new HMACSHA256(move.HMACKey)){
-                var hs = hmac.ComputeHash(Encoding.ASCII.GetBytes(_movesDictionary[move.MoveKey]));
-                for (var i = 0; i < hs.Length; i++)
-                {
-                    if(hs[i]==move.HMAC[i])
-                    Console.Write("1");
-                    else
-                    Console.Write("0");
-                }
-            }
-        }
-        static bool InputsAreValid(string[] args)
+        private static bool InputsAreValid(string[] args)
         {
             if (args.Length < 3 || args.Length % 2 == 0)
                 return false;
@@ -97,7 +77,7 @@ namespace Third
             return true;
         }
 
-        static void InitializeMovesDictionary(string[] args)
+        private static void InitializeMovesDictionary(string[] args)
         {
             for (int i = 0; i < args.Length; i++)
             {
@@ -106,7 +86,7 @@ namespace Third
             _movesDictionary.Add(0, "exit");
         }
 
-        static EncryptedMove GetAIMove()
+        private static EncryptedMove GetAIMove()
         {
             Random rnd = new Random();
             int moveKey = rnd.Next(1, _movesDictionary.Count - 1);
@@ -114,18 +94,18 @@ namespace Third
             return new EncryptedMove(moveKey, _movesDictionary);
         }
 
-        static int GetPlayerMove()
+        private static int GetPlayerMove()
         {
             while (true)
             {
                 if (int.TryParse(Console.ReadLine(), out int moveKey) && _movesDictionary.ContainsKey(moveKey))
                     return moveKey;
                 else
-                    Console.WriteLine(IncorrectMoveMesssage);
+                    Console.WriteLine(InvalidMoveMesssage);
             }
         }
 
-        static int CalcResult(int playersMoveKey, int aiMoveKey)
+        private static int CalcResult(int playersMoveKey, int aiMoveKey)
         {
             if (playersMoveKey == aiMoveKey)
                 return 0;
@@ -138,42 +118,40 @@ namespace Third
             else
                 return 2;
         }
-    }
 
-    internal class EncryptedMove
-    {
-        internal readonly int MoveKey;
-        internal readonly byte[] HMACKey;
-        internal readonly byte[] HMAC;
-
-        internal string HMACStringView
+        private class EncryptedMove
         {
-            get
-            {
-                return BitConverter.ToString(HMAC).Replace("-", "");
-            }
-        }
- 
-        internal string HMACKeyStringView
-        {
-            get
-            {
-                return BitConverter.ToString(HMACKey).Replace("-", "");
-            }
-        }
+            internal readonly int MoveKey;
+            internal readonly byte[] HMACKey;
+            internal readonly byte[] HMAC;
 
-        internal EncryptedMove(int moveKey, Dictionary<int, string> movesDictionary)
-        {
-            MoveKey = moveKey;
-            HMACKey = new byte[16];
-
-            using (var cRnd = new RNGCryptoServiceProvider())
+            internal string HMACStringView
             {
-                cRnd.GetBytes(HMACKey);
+                get
+                {
+                    return BitConverter.ToString(HMAC).Replace("-", "");
+                }
             }
 
-            using (var hmac = new HMACSHA256(HMACKey))
+            internal string HMACKeyStringView
             {
+                get
+                {
+                    return BitConverter.ToString(HMACKey).Replace("-", "");
+                }
+            }
+
+            internal EncryptedMove(int moveKey, Dictionary<int, string> movesDictionary)
+            {
+                MoveKey = moveKey;
+                HMACKey = new byte[16];
+
+                using (var cRnd = new RNGCryptoServiceProvider())
+                {
+                    cRnd.GetBytes(HMACKey);
+                }
+
+                var hmac = new HMACSHA256(HMACKey);
                 string aiMove = movesDictionary[moveKey];
                 HMAC = hmac.ComputeHash(Encoding.ASCII.GetBytes(aiMove));
             }
